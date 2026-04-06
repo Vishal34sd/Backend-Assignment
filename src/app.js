@@ -4,10 +4,6 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 
-import routes from "./routes/index.js";
-import notFound from "./middlewares/notFoundMiddleware.js";
-import errorHandler from "./middlewares/errorMiddleware.js";
-
 const app = express();
 
 const limiter = rateLimit({
@@ -25,10 +21,5 @@ app.use(limiter);
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
-
-app.use("/api", routes);
-
-app.use(notFound);
-app.use(errorHandler);
 
 export default app;

@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-import { ROLES, USER_STATUS } from "../config/constants.js";
+const roles = ["viewer", "analyst", "admin"];
+const statuses = ["active", "inactive"];
 
 const userSchema = new mongoose.Schema(
   {
@@ -27,14 +28,14 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: Object.values(ROLES),
-      default: ROLES.VIEWER,
+      enum: roles,
+      default: "viewer",
       index: true
     },
     status: {
       type: String,
-      enum: Object.values(USER_STATUS),
-      default: USER_STATUS.ACTIVE,
+      enum: statuses,
+      default: "active",
       index: true
     }
   },

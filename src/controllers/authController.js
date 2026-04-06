@@ -1,7 +1,6 @@
 import User from "../models/User.js";
 import ApiError from "../utils/ApiError.js";
 import { signToken } from "../utils/jwt.js";
-import { ROLES, USER_STATUS } from "../config/constants.js";
 
 export const createDefaultAdmin = async (req, res, next) => {
   try {
@@ -16,8 +15,8 @@ export const createDefaultAdmin = async (req, res, next) => {
       name: req.body.name,
       email,
       password: req.body.password,
-      role: ROLES.ADMIN,
-      status: USER_STATUS.ACTIVE
+      role: "admin",
+      status: "active"
     });
 
     const token = signToken({ userId: user._id, role: user.role });
@@ -39,7 +38,7 @@ export const login = async (req, res, next) => {
       throw new ApiError(401, "Invalid credentials");
     }
 
-    if (user.status !== USER_STATUS.ACTIVE) {
+    if (user.status !== "active") {
       throw new ApiError(403, "User account is inactive");
     }
 

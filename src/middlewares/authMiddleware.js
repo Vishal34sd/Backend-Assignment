@@ -1,7 +1,6 @@
 import User from "../models/User.js";
 import { verifyToken } from "../utils/jwt.js";
 import ApiError from "../utils/ApiError.js";
-import { USER_STATUS } from "../config/constants.js";
 
 const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -20,7 +19,7 @@ const authenticate = async (req, res, next) => {
       return next(new ApiError(401, "User not found"));
     }
 
-    if (user.status !== USER_STATUS.ACTIVE) {
+    if (user.status !== "active") {
       return next(new ApiError(403, "User account is inactive"));
     }
 

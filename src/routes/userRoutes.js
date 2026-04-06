@@ -4,13 +4,12 @@ import { createUser, getUsers, getUserById, updateUser, deleteUser } from "../co
 import authenticate from "../middlewares/authMiddleware.js";
 import authorize from "../middlewares/roleMiddleware.js";
 import validate from "../middlewares/validateMiddleware.js";
-import { ROLES } from "../config/constants.js";
 import { createUserSchema, updateUserSchema } from "../validators/userValidators.js";
 
 const router = express.Router();
 
 router.use(authenticate);
-router.use(authorize(ROLES.ADMIN));
+router.use(authorize("admin"));
 
 router.post("/", validate(createUserSchema), createUser);
 router.get("/", getUsers);

@@ -4,7 +4,6 @@ import { createRecord, getRecords, getRecordById, updateRecord, deleteRecord } f
 import authenticate from "../middlewares/authMiddleware.js";
 import authorize from "../middlewares/roleMiddleware.js";
 import validate from "../middlewares/validateMiddleware.js";
-import { ROLES } from "../config/constants.js";
 import {
   createRecordSchema,
   updateRecordSchema,
@@ -17,15 +16,15 @@ router.use(authenticate);
 
 router.get(
   "/",
-  authorize(ROLES.VIEWER, ROLES.ANALYST, ROLES.ADMIN),
+  authorize("viewer", "analyst", "admin"),
   validate(listRecordQuerySchema, "query"),
   getRecords
 );
 
-router.get("/:id", authorize(ROLES.VIEWER, ROLES.ANALYST, ROLES.ADMIN), getRecordById);
+router.get("/:id", authorize("viewer", "analyst", "admin"), getRecordById);
 
-router.post("/", authorize(ROLES.ADMIN), validate(createRecordSchema), createRecord);
-router.patch("/:id", authorize(ROLES.ADMIN), validate(updateRecordSchema), updateRecord);
-router.delete("/:id", authorize(ROLES.ADMIN), deleteRecord);
+router.post("/", authorize("admin"), validate(createRecordSchema), createRecord);
+router.patch("/:id", authorize("admin"), validate(updateRecordSchema), updateRecord);
+router.delete("/:id", authorize("admin"), deleteRecord);
 
 export default router;
