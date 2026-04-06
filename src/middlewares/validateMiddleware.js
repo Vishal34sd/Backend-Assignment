@@ -1,24 +1,30 @@
 const ApiError = require("../utils/ApiError");
+const { ZodError } = require("zod");
 
 const validate = (schema, source = "body") => (req, res, next) => {
   const payload = req[source];
-  const { error, value } = schema.validate(payload, {
-    abortEarly: false,
-    stripUnknown: true
-  });
+  const parsedResult = schema.safeParse(payload);
 
-  if (error) {
+  if (parsedResult.success) {
+    req[source] = parsedResult.data;
+    return next();
+  }
+
+  if (parsedResult.error instanceof ZodError) {
+    const details = parsedResult.error.issues.map((issue) => {
+      if (issue.path.length > 0) {
+        return `${issue.path.join(".")}: ${issue.message}`;
+      }
+
+      return issue.message;
+    });
+
     return next(
-      new ApiError(
-        400,
-        "Invalid input",
-        error.details.map((detail) => detail.message)
-      )
+      new ApiError(400, "Invalid input", details)
     );
   }
 
-  req[source] = value;
-  return next();
+  return next(new ApiError(400, "Invalid input"));
 };
 
 module.exports = validate;

@@ -1,39 +1,71 @@
-const Joi = require("joi");
+const { z } = require("zod");
 
-const createRecordSchema = Joi.object({
-  amount: Joi.number().positive().required(),
-  type: Joi.string().valid("income", "expense").required(),
-  category: Joi.string().min(2).max(100).required(),
-  date: Joi.date().required(),
-  notes: Joi.string().allow("").max(500).optional()
-});
+const createRecordSchema = z
+  .object({
+    amount: z.number().positive(),
+    type: z.enum(["income", "expense"]),
+    category: z.string().min(2).max(100),
+    date: z.coerce.date(),
+    notes: z.string().max(500).optional()
+  });
 
-const updateRecordSchema = Joi.object({
-  amount: Joi.number().positive(),
-  type: Joi.string().valid("income", "expense"),
-  category: Joi.string().min(2).max(100),
-  date: Joi.date(),
-  notes: Joi.string().allow("").max(500)
-}).min(1);
+const updateRecordSchema = z
+  .object({
+    amount: z.number().positive().optional(),
+    type: z.enum(["income", "expense"]).optional(),
+    category: z.string().min(2).max(100).optional(),
+    date: z.coerce.date().optional(),
+    notes: z.string().max(500).optional()
+  })
+  .refine(
+    (value) => {
+      if (value.amount !== undefined) {
+        return true;
+      }
 
-const listRecordQuerySchema = Joi.object({
-  startDate: Joi.date().optional(),
-  endDate: Joi.date().optional(),
-  type: Joi.string().valid("income", "expense").optional(),
-  category: Joi.string().max(100).optional(),
-  search: Joi.string().max(200).optional(),
-  page: Joi.number().integer().min(1).default(1),
-  limit: Joi.number().integer().min(1).max(100).default(10),
-  sortBy: Joi.string().valid("date", "amount", "category", "createdAt").default("date"),
-  sortOrder: Joi.string().valid("asc", "desc").default("desc")
-});
+      if (value.type !== undefined) {
+        return true;
+      }
 
-const dashboardQuerySchema = Joi.object({
-  startDate: Joi.date().optional(),
-  endDate: Joi.date().optional(),
-  category: Joi.string().max(100).optional(),
-  recentLimit: Joi.number().integer().min(1).max(20).default(5)
-});
+      if (value.category !== undefined) {
+        return true;
+      }
+
+      if (value.date !== undefined) {
+        return true;
+      }
+
+      if (value.notes !== undefined) {
+        return true;
+      }
+
+      return false;
+    },
+    {
+      message: "At least one field is required"
+    }
+  );
+
+const listRecordQuerySchema = z
+  .object({
+    startDate: z.coerce.date().optional(),
+    endDate: z.coerce.date().optional(),
+    type: z.enum(["income", "expense"]).optional(),
+    category: z.string().max(100).optional(),
+    search: z.string().max(200).optional(),
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(100).default(10),
+    sortBy: z.enum(["date", "amount", "category", "createdAt"]).default("date"),
+    sortOrder: z.enum(["asc", "desc"]).default("desc")
+  });
+
+const dashboardQuerySchema = z
+  .object({
+    startDate: z.coerce.date().optional(),
+    endDate: z.coerce.date().optional(),
+    category: z.string().max(100).optional(),
+    recentLimit: z.coerce.number().int().min(1).max(20).default(5)
+  });
 
 module.exports = {
   createRecordSchema,

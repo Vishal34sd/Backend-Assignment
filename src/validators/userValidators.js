@@ -1,21 +1,43 @@
-const Joi = require("joi");
+const { z } = require("zod");
 
-const userRole = Joi.string().valid("viewer", "analyst", "admin");
-const userStatus = Joi.string().valid("active", "inactive");
+const userRole = z.enum(["viewer", "analyst", "admin"]);
+const userStatus = z.enum(["active", "inactive"]);
 
-const createUserSchema = Joi.object({
-  name: Joi.string().min(2).max(100).required(),
-  email: Joi.string().email().required(),
-  password: Joi.string().min(8).required(),
-  role: userRole.optional(),
-  status: userStatus.optional()
-});
+const createUserSchema = z
+  .object({
+    name: z.string().min(2).max(100),
+    email: z.string().email(),
+    password: z.string().min(8),
+    role: userRole.optional(),
+    status: userStatus.optional()
+  });
 
-const updateUserSchema = Joi.object({
-  name: Joi.string().min(2).max(100),
-  role: userRole,
-  status: userStatus
-}).min(1);
+const updateUserSchema = z
+  .object({
+    name: z.string().min(2).max(100).optional(),
+    role: userRole.optional(),
+    status: userStatus.optional()
+  })
+  .refine(
+    (value) => {
+      if (value.name !== undefined) {
+        return true;
+      }
+
+      if (value.role !== undefined) {
+        return true;
+      }
+
+      if (value.status !== undefined) {
+        return true;
+      }
+
+      return false;
+    },
+    {
+      message: "At least one field is required"
+    }
+  );
 
 module.exports = {
   createUserSchema,

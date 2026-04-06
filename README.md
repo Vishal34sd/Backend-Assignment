@@ -7,7 +7,7 @@ A cleanly structured Node.js + Express + MongoDB backend for a Finance Dashboard
 - Node.js + Express
 - MongoDB + Mongoose
 - JWT authentication
-- Joi validation
+- Zod validation
 - Role-based access control (viewer, analyst, admin)
 
 ## Architecture
@@ -19,17 +19,15 @@ A cleanly structured Node.js + Express + MongoDB backend for a Finance Dashboard
   /middlewares
   /models
   /routes
-  /services
   /utils
   /validators
 server.js
 ```
 
-Flow follows clean architecture layers:
+Flow follows API layers:
 
 - Routes: request mapping + middleware composition
-- Controllers: HTTP concerns only
-- Services: business logic and data orchestration
+- Controllers: request handling + business logic
 - Models: MongoDB schemas and indexing
 
 ## Setup
@@ -151,7 +149,7 @@ Dashboard aggregation includes:
 
 ## Validation and Error Handling
 
-- Joi-based request validation with `400 Bad Request`
+- Zod-based request validation with `400 Bad Request`
 - JWT auth failures return `401 Unauthorized`
 - RBAC failures return `403 Forbidden`
 - Not found resources return `404 Not Found`
@@ -164,7 +162,7 @@ Dashboard aggregation includes:
 - CORS enabled
 - Rate limiting enabled globally
 - Soft delete for records
-- Input sanitation via Joi `stripUnknown`
+- Input sanitation via Zod object parsing
 
 ## Assumptions
 
