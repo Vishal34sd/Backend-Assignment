@@ -1,7 +1,7 @@
-const User = require("../models/User");
-const ApiError = require("../utils/ApiError");
+import User from "../models/User.js";
+import ApiError from "../utils/ApiError.js";
 
-const createUser = async (req, res, next) => {
+export const createUser = async (req, res, next) => {
   try {
     const email = req.body.email.toLowerCase();
     const existing = await User.findOne({ email });
@@ -24,7 +24,7 @@ const createUser = async (req, res, next) => {
   }
 };
 
-const getUsers = async (req, res, next) => {
+export const getUsers = async (req, res, next) => {
   try {
     const users = await User.find().sort({ createdAt: -1 });
     const safeUsers = users.map((user) => user.toSafeObject());
@@ -34,7 +34,7 @@ const getUsers = async (req, res, next) => {
   }
 };
 
-const getUserById = async (req, res, next) => {
+export const getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
 
@@ -48,7 +48,7 @@ const getUserById = async (req, res, next) => {
   }
 };
 
-const updateUser = async (req, res, next) => {
+export const updateUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
 
@@ -75,7 +75,7 @@ const updateUser = async (req, res, next) => {
   }
 };
 
-const deleteUser = async (req, res, next) => {
+export const deleteUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
 
@@ -90,10 +90,3 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-module.exports = {
-  createUser,
-  getUsers,
-  getUserById,
-  updateUser,
-  deleteUser
-};

@@ -96,7 +96,7 @@ Base URL: `/api`
 
 ### Auth
 
-- `POST /auth/bootstrap-admin` (create first admin only when no users exist)
+- `POST /auth/create-default-admin` (create first admin only when no users exist)
 - `POST /auth/login`
 
 ### Users (Admin only)
@@ -168,7 +168,7 @@ Dashboard aggregation includes:
 
 - Analytics are organization-wide (not user-scoped)
 - User management is strictly admin-controlled
-- First admin is bootstrapped once using `/auth/bootstrap-admin`
+- First admin is created once using `/auth/create-default-admin`
 - Viewer cannot access analytics endpoints
 
 ## Example Auth Header

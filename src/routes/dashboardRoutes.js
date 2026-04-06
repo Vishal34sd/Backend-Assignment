@@ -1,11 +1,11 @@
-const express = require("express");
+import express from "express";
 
-const dashboardController = require("../controllers/dashboardController");
-const authenticate = require("../middlewares/authMiddleware");
-const authorize = require("../middlewares/roleMiddleware");
-const validate = require("../middlewares/validateMiddleware");
-const { ROLES } = require("../config/constants");
-const { dashboardQuerySchema } = require("../validators/recordValidators");
+import { getDashboardSummary } from "../controllers/dashboardController.js";
+import authenticate from "../middlewares/authMiddleware.js";
+import authorize from "../middlewares/roleMiddleware.js";
+import validate from "../middlewares/validateMiddleware.js";
+import { ROLES } from "../config/constants.js";
+import { dashboardQuerySchema } from "../validators/recordValidators.js";
 
 const router = express.Router();
 
@@ -14,7 +14,7 @@ router.get(
   authenticate,
   authorize(ROLES.ANALYST, ROLES.ADMIN),
   validate(dashboardQuerySchema, "query"),
-  dashboardController.getDashboardSummary
+  getDashboardSummary
 );
 
-module.exports = router;
+export default router;

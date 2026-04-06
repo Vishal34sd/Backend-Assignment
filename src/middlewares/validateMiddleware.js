@@ -1,5 +1,5 @@
-const ApiError = require("../utils/ApiError");
-const { ZodError } = require("zod");
+import ApiError from "../utils/ApiError.js";
+import { ZodError } from "zod";
 
 const validate = (schema, source = "body") => (req, res, next) => {
   const payload = req[source];
@@ -27,4 +27,4 @@ const validate = (schema, source = "body") => (req, res, next) => {
   return next(new ApiError(400, "Invalid input"));
 };
 
-module.exports = validate;
+export default validate;

@@ -2,6 +2,7 @@
   "name": "backend-assignment",
   "version": "1.0.0",
   "description": "Finance Dashboard backend API with RBAC and analytics",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",

@@ -1,21 +1,21 @@
-const express = require("express");
+import express from "express";
 
-const userController = require("../controllers/userController");
-const authenticate = require("../middlewares/authMiddleware");
-const authorize = require("../middlewares/roleMiddleware");
-const validate = require("../middlewares/validateMiddleware");
-const { ROLES } = require("../config/constants");
-const { createUserSchema, updateUserSchema } = require("../validators/userValidators");
+import { createUser, getUsers, getUserById, updateUser, deleteUser } from "../controllers/userController.js";
+import authenticate from "../middlewares/authMiddleware.js";
+import authorize from "../middlewares/roleMiddleware.js";
+import validate from "../middlewares/validateMiddleware.js";
+import { ROLES } from "../config/constants.js";
+import { createUserSchema, updateUserSchema } from "../validators/userValidators.js";
 
 const router = express.Router();
 
 router.use(authenticate);
 router.use(authorize(ROLES.ADMIN));
 
-router.post("/", validate(createUserSchema), userController.createUser);
-router.get("/", userController.getUsers);
-router.get("/:id", userController.getUserById);
-router.patch("/:id", validate(updateUserSchema), userController.updateUser);
-router.delete("/:id", userController.deleteUser);
+router.post("/", validate(createUserSchema), createUser);
+router.get("/", getUsers);
+router.get("/:id", getUserById);
+router.patch("/:id", validate(updateUserSchema), updateUser);
+router.delete("/:id", deleteUser);
 
-module.exports = router;
+export default router;

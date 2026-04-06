@@ -1,9 +1,9 @@
-const { z } = require("zod");
+import { z } from "zod";
 
 const userRole = z.enum(["viewer", "analyst", "admin"]);
 const userStatus = z.enum(["active", "inactive"]);
 
-const createUserSchema = z
+export const createUserSchema = z
   .object({
     name: z.string().min(2).max(100),
     email: z.string().email(),
@@ -12,7 +12,7 @@ const createUserSchema = z
     status: userStatus.optional()
   });
 
-const updateUserSchema = z
+export const updateUserSchema = z
   .object({
     name: z.string().min(2).max(100).optional(),
     role: userRole.optional(),
@@ -38,8 +38,3 @@ const updateUserSchema = z
       message: "At least one field is required"
     }
   );
-
-module.exports = {
-  createUserSchema,
-  updateUserSchema
-};

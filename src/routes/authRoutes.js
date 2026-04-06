@@ -1,12 +1,12 @@
-const express = require("express");
+import express from "express";
 
-const authController = require("../controllers/authController");
-const validate = require("../middlewares/validateMiddleware");
-const { loginSchema, bootstrapAdminSchema } = require("../validators/authValidators");
+import { createDefaultAdmin, login } from "../controllers/authController.js";
+import validate from "../middlewares/validateMiddleware.js";
+import { loginSchema, createDefaultAdminSchema } from "../validators/authValidators.js";
 
 const router = express.Router();
 
-router.post("/bootstrap-admin", validate(bootstrapAdminSchema), authController.bootstrapAdmin);
-router.post("/login", validate(loginSchema), authController.login);
+router.post("/create-default-admin", validate(createDefaultAdminSchema), createDefaultAdmin);
+router.post("/login", validate(loginSchema), login);
 
-module.exports = router;
+export default router;

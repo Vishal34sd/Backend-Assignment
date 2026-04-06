@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const recordSchema = new mongoose.Schema(
   {
@@ -52,4 +52,6 @@ recordSchema.index({ date: -1, category: 1 });
 recordSchema.index({ type: 1, date: -1 });
 recordSchema.index({ notes: "text", category: "text" });
 
-module.exports = mongoose.model("FinancialRecord", recordSchema);
+const FinancialRecord = mongoose.model("FinancialRecord", recordSchema);
+
+export default FinancialRecord;

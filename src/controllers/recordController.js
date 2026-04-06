@@ -1,5 +1,5 @@
-const FinancialRecord = require("../models/FinancialRecord");
-const ApiError = require("../utils/ApiError");
+import FinancialRecord from "../models/FinancialRecord.js";
+import ApiError from "../utils/ApiError.js";
 
 const buildRecordFilter = (query = {}) => {
   const filter = { isDeleted: false };
@@ -31,7 +31,7 @@ const buildRecordFilter = (query = {}) => {
   return filter;
 };
 
-const createRecord = async (req, res, next) => {
+export const createRecord = async (req, res, next) => {
   try {
     const record = await FinancialRecord.create({
       amount: req.body.amount,
@@ -48,7 +48,7 @@ const createRecord = async (req, res, next) => {
   }
 };
 
-const getRecords = async (req, res, next) => {
+export const getRecords = async (req, res, next) => {
   try {
     const filter = buildRecordFilter(req.query);
     const page = req.query.page;
@@ -88,7 +88,7 @@ const getRecords = async (req, res, next) => {
   }
 };
 
-const getRecordById = async (req, res, next) => {
+export const getRecordById = async (req, res, next) => {
   try {
     const record = await FinancialRecord.findOne({
       _id: req.params.id,
@@ -105,7 +105,7 @@ const getRecordById = async (req, res, next) => {
   }
 };
 
-const updateRecord = async (req, res, next) => {
+export const updateRecord = async (req, res, next) => {
   try {
     const record = await FinancialRecord.findOne({
       _id: req.params.id,
@@ -154,7 +154,7 @@ const updateRecord = async (req, res, next) => {
   }
 };
 
-const deleteRecord = async (req, res, next) => {
+export const deleteRecord = async (req, res, next) => {
   try {
     const record = await FinancialRecord.findOne({
       _id: req.params.id,
@@ -174,10 +174,3 @@ const deleteRecord = async (req, res, next) => {
   }
 };
 
-module.exports = {
-  createRecord,
-  getRecords,
-  getRecordById,
-  updateRecord,
-  deleteRecord
-};

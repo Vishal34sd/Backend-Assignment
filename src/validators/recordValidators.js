@@ -1,6 +1,6 @@
-const { z } = require("zod");
+import { z } from "zod";
 
-const createRecordSchema = z
+export const createRecordSchema = z
   .object({
     amount: z.number().positive(),
     type: z.enum(["income", "expense"]),
@@ -9,7 +9,7 @@ const createRecordSchema = z
     notes: z.string().max(500).optional()
   });
 
-const updateRecordSchema = z
+export const updateRecordSchema = z
   .object({
     amount: z.number().positive().optional(),
     type: z.enum(["income", "expense"]).optional(),
@@ -46,7 +46,7 @@ const updateRecordSchema = z
     }
   );
 
-const listRecordQuerySchema = z
+export const listRecordQuerySchema = z
   .object({
     startDate: z.coerce.date().optional(),
     endDate: z.coerce.date().optional(),
@@ -59,17 +59,10 @@ const listRecordQuerySchema = z
     sortOrder: z.enum(["asc", "desc"]).default("desc")
   });
 
-const dashboardQuerySchema = z
+export const dashboardQuerySchema = z
   .object({
     startDate: z.coerce.date().optional(),
     endDate: z.coerce.date().optional(),
     category: z.string().max(100).optional(),
     recentLimit: z.coerce.number().int().min(1).max(20).default(5)
   });
-
-module.exports = {
-  createRecordSchema,
-  updateRecordSchema,
-  listRecordQuerySchema,
-  dashboardQuerySchema
-};

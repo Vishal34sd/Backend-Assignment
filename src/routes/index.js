@@ -1,9 +1,9 @@
-const express = require("express");
+import express from "express";
 
-const authRoutes = require("./authRoutes");
-const userRoutes = require("./userRoutes");
-const recordRoutes = require("./recordRoutes");
-const dashboardRoutes = require("./dashboardRoutes");
+import authRoutes from "./authRoutes.js";
+import userRoutes from "./userRoutes.js";
+import recordRoutes from "./recordRoutes.js";
+import dashboardRoutes from "./dashboardRoutes.js";
 
 const router = express.Router();
 
@@ -12,4 +12,4 @@ router.use("/users", userRoutes);
 router.use("/records", recordRoutes);
 router.use("/dashboard", dashboardRoutes);
 
-module.exports = router;
+export default router;

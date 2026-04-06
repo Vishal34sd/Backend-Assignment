@@ -1,7 +1,7 @@
-const User = require("../models/User");
-const { verifyToken } = require("../utils/jwt");
-const ApiError = require("../utils/ApiError");
-const { USER_STATUS } = require("../config/constants");
+import User from "../models/User.js";
+import { verifyToken } from "../utils/jwt.js";
+import ApiError from "../utils/ApiError.js";
+import { USER_STATUS } from "../config/constants.js";
 
 const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -37,4 +37,4 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-module.exports = authenticate;
+export default authenticate;

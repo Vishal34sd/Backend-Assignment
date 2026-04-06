@@ -1,15 +1,15 @@
-const express = require("express");
+import express from "express";
 
-const recordController = require("../controllers/recordController");
-const authenticate = require("../middlewares/authMiddleware");
-const authorize = require("../middlewares/roleMiddleware");
-const validate = require("../middlewares/validateMiddleware");
-const { ROLES } = require("../config/constants");
-const {
+import { createRecord, getRecords, getRecordById, updateRecord, deleteRecord } from "../controllers/recordController.js";
+import authenticate from "../middlewares/authMiddleware.js";
+import authorize from "../middlewares/roleMiddleware.js";
+import validate from "../middlewares/validateMiddleware.js";
+import { ROLES } from "../config/constants.js";
+import {
   createRecordSchema,
   updateRecordSchema,
   listRecordQuerySchema
-} = require("../validators/recordValidators");
+} from "../validators/recordValidators.js";
 
 const router = express.Router();
 
@@ -19,13 +19,13 @@ router.get(
   "/",
   authorize(ROLES.VIEWER, ROLES.ANALYST, ROLES.ADMIN),
   validate(listRecordQuerySchema, "query"),
-  recordController.getRecords
+  getRecords
 );
 
-router.get("/:id", authorize(ROLES.VIEWER, ROLES.ANALYST, ROLES.ADMIN), recordController.getRecordById);
+router.get("/:id", authorize(ROLES.VIEWER, ROLES.ANALYST, ROLES.ADMIN), getRecordById);
 
-router.post("/", authorize(ROLES.ADMIN), validate(createRecordSchema), recordController.createRecord);
-router.patch("/:id", authorize(ROLES.ADMIN), validate(updateRecordSchema), recordController.updateRecord);
-router.delete("/:id", authorize(ROLES.ADMIN), recordController.deleteRecord);
+router.post("/", authorize(ROLES.ADMIN), validate(createRecordSchema), createRecord);
+router.patch("/:id", authorize(ROLES.ADMIN), validate(updateRecordSchema), updateRecord);
+router.delete("/:id", authorize(ROLES.ADMIN), deleteRecord);
 
-module.exports = router;
+export default router;

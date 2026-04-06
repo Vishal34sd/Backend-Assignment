@@ -1,4 +1,4 @@
-const FinancialRecord = require("../models/FinancialRecord");
+import FinancialRecord from "../models/FinancialRecord.js";
 
 const buildRecordFilter = (query = {}) => {
   const filter = { isDeleted: false };
@@ -22,7 +22,7 @@ const buildRecordFilter = (query = {}) => {
   return filter;
 };
 
-const getDashboardSummary = async (req, res, next) => {
+export const getDashboardSummary = async (req, res, next) => {
   try {
     const baseMatch = buildRecordFilter(req.query);
     const recentLimit = req.query.recentLimit;
@@ -126,7 +126,5 @@ const getDashboardSummary = async (req, res, next) => {
   }
 };
 
-module.exports = {
-  getDashboardSummary
-};
+
 
