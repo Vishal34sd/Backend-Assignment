@@ -1,34 +1,48 @@
-# Finance Dashboard Backend
+# Backend Assignment API
 
-A cleanly structured Node.js + Express + MongoDB backend for a Finance Dashboard application.
+Node.js + Express + MongoDB backend for finance record management, role-based access control, and dashboard analytics.
+
+## Features
+
+- JWT-based authentication
+- Role-based authorization (`viewer`, `analyst`, `admin`)
+- Zod request validation (body and query)
+- Financial record CRUD with soft delete
+- Dashboard summary with aggregation pipelines
+- Global rate limiting
+- Centralized error handling
 
 ## Tech Stack
 
-- Node.js + Express
+- Node.js (ES Modules)
+- Express
 - MongoDB + Mongoose
-- JWT authentication
-- Zod validation
-- Role-based access control (viewer, analyst, admin)
+- Zod
+- JSON Web Token (`jsonwebtoken`)
+- `bcryptjs` for password hashing
 
-## Architecture
+## Project Structure
 
 ```text
-/src
-  /config
-  /controllers
-  /middlewares
-  /models
-  /routes
-  /utils
-  /validators
-server.js
+.
+|-- server.js
+|-- src
+|   |-- app.js
+|   |-- config
+|   |   `-- db.js
+|   |-- controllers
+|   |-- middlewares
+|   |-- models
+|   |-- routes
+|   |-- utils
+|   `-- validators
+`-- .env.example
 ```
 
-Flow follows API layers:
+## Prerequisites
 
-- Routes: request mapping + middleware composition
-- Controllers: request handling + business logic
-- Models: MongoDB schemas and indexing
+- Node.js 18+
+- MongoDB instance (local or cloud)
 
 ## Setup
 
@@ -38,66 +52,106 @@ Flow follows API layers:
 npm install
 ```
 
-2. Configure environment:
+2. Create environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-3. Run in development:
+On Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+3. Update `.env` values.
+
+4. Run in development:
 
 ```bash
 npm run dev
 ```
 
-4. Run in production mode:
+5. Run in production mode:
 
 ```bash
 npm start
 ```
 
+## Environment Variables
+
+Defined in `.env.example`:
+
+- `PORT` (default in code: `8080` when not set)
+- `NODE_ENV`
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `JWT_EXPIRES_IN` (default in code: `1d`)
+
+## Runtime Behavior
+
+- Health check endpoint: `GET /health`
+- API base path: `/api`
+- Global request limit: 300 requests per 15 minutes
+- JSON body size limit: 1 MB
+
+## Authentication and Authorization
+
+1. Bootstrap the system once with `POST /api/auth/create-default-admin`.
+2. Login with `POST /api/auth/login` to receive a JWT.
+3. Send token in header:
+
+```http
+Authorization: Bearer <jwt-token>
+```
+
+### Role Access Matrix
+
+- `viewer`: read records only
+- `analyst`: read records + dashboard summary
+- `admin`: full access to users and records
+
 ## Data Models
 
 ### User
 
-- name (string)
-- email (unique, indexed)
-- password (hashed with bcrypt)
-- role: viewer | analyst | admin (indexed)
-- status: active | inactive (indexed)
-- timestamps
+- `name`: string (2-100)
+- `email`: unique, indexed, lowercase
+- `password`: hashed (`bcrypt`, 12 salt rounds), excluded by default
+- `role`: `viewer | analyst | admin`
+- `status`: `active | inactive`
+- `createdAt`, `updatedAt`
 
 ### FinancialRecord
 
-- amount (number)
-- type: income | expense (indexed)
-- category (indexed)
-- date (indexed)
-- notes
-- createdBy (ObjectId reference to User, indexed)
-- isDeleted (soft delete flag)
-- timestamps
+- `amount`: positive number
+- `type`: `income | expense`
+- `category`: string (max 100)
+- `date`: Date
+- `notes`: optional string (max 500)
+- `createdBy`: reference to `User`
+- `isDeleted`: boolean (soft delete)
+- `createdAt`, `updatedAt`
 
-Additional indexes:
+Indexes:
 
-- Compound index on date + category
-- Compound index on type + date
-- Text index on notes + category for search
-
-## RBAC Rules
-
-- Viewer: read-only records access
-- Analyst: read-only records + dashboard analytics
-- Admin: full CRUD on records + user management
+- `date + category`
+- `type + date`
+- text index on `notes + category`
 
 ## API Endpoints
 
-Base URL: `/api`
+All routes below are prefixed with `/api`.
 
 ### Auth
 
-- `POST /auth/create-default-admin` (create first admin only when no users exist)
+- `POST /auth/create-default-admin`
+  - Public endpoint
+  - Works only when there are no users in the system
+  - Body: `{ "name", "email", "password" }`
 - `POST /auth/login`
+  - Public endpoint
+  - Body: `{ "email", "password" }`
 
 ### Users (Admin only)
 
@@ -107,72 +161,88 @@ Base URL: `/api`
 - `PATCH /users/:id`
 - `DELETE /users/:id`
 
-### Financial Records
+Create body:
 
-- `POST /records` (Admin)
-- `GET /records` (Viewer/Analyst/Admin)
-- `GET /records/:id` (Viewer/Analyst/Admin)
-- `PATCH /records/:id` (Admin)
-- `DELETE /records/:id` (Admin, soft delete)
+```json
+{
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "password": "password123",
+  "role": "viewer",
+  "status": "active"
+}
+```
 
-Supported query filters for `GET /records`:
+Update body accepts any of:
 
-- startDate
-- endDate
-- type
-- category
-- search
-- page
-- limit
-- sortBy (date, amount, category, createdAt)
-- sortOrder (asc, desc)
+- `name`
+- `role`
+- `status`
+
+### Records
+
+- `POST /records` (admin)
+- `GET /records` (viewer, analyst, admin)
+- `GET /records/:id` (viewer, analyst, admin)
+- `PATCH /records/:id` (admin)
+- `DELETE /records/:id` (admin, soft delete)
+
+Create body:
+
+```json
+{
+  "amount": 2500,
+  "type": "income",
+  "category": "Salary",
+  "date": "2026-04-01",
+  "notes": "April salary"
+}
+```
+
+List query params:
+
+- `startDate`, `endDate`
+- `type` (`income` or `expense`)
+- `category`
+- `search` (text search over `notes` and `category`)
+- `page` (default `1`)
+- `limit` (default `10`, max `100`)
+- `sortBy` (`date`, `amount`, `category`, `createdAt`)
+- `sortOrder` (`asc`, `desc`)
 
 ### Dashboard
 
-- `GET /dashboard/summary` (Analyst/Admin)
+- `GET /dashboard/summary` (analyst, admin)
 
-Supported query params:
+Query params:
 
-- startDate
-- endDate
-- category
-- recentLimit
+- `startDate`, `endDate`
+- `category`
+- `recentLimit` (default `5`, max `20`)
 
-Dashboard aggregation includes:
+Response includes:
 
-- Total income
-- Total expenses
-- Net balance
-- Category-wise aggregation
-- Monthly trends
-- Recent transactions
+- `totalIncome`
+- `totalExpenses`
+- `netBalance`
+- `categoryWise`
+- `monthlyTrends`
+- `recentTransactions`
 
 ## Validation and Error Handling
 
-- Zod-based request validation with `400 Bad Request`
-- JWT auth failures return `401 Unauthorized`
-- RBAC failures return `403 Forbidden`
-- Not found resources return `404 Not Found`
-- Duplicate unique values return `409 Conflict`
-- Centralized error middleware for consistent responses
+- Zod validation errors return `400` with details.
+- Invalid or missing auth token returns `401`.
+- Role violations return `403`.
+- Invalid MongoDB id format returns `400`.
+- Missing resources return `404`.
+- Duplicate unique values return `409`.
 
-## Security and Reliability Enhancements
+Typical error format:
 
-- Helmet for secure headers
-- CORS enabled
-- Rate limiting enabled globally
-- Soft delete for records
-- Input sanitation via Zod object parsing
-
-## Assumptions
-
-- Analytics are organization-wide (not user-scoped)
-- User management is strictly admin-controlled
-- First admin is created once using `/auth/create-default-admin`
-- Viewer cannot access analytics endpoints
-
-## Example Auth Header
-
-```http
-Authorization: Bearer <jwt-token>
+```json
+{
+  "message": "Invalid input",
+  "details": ["email: Invalid email address"]
+}
 ```
